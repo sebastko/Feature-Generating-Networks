@@ -8,7 +8,7 @@ import scipy.io as scio
 from sklearn.preprocessing import MinMaxScaler
 
 class ZSLDataset(Dataset):
-    def __init__(self, dset, n_train, n_test, gzsl=False, train=True, synthetic=False, syn_dataset=None):
+    def __init__(self, dset, n_train, n_test, gzsl=False, train=True, synthetic=False, syn_dataset=None, device=None):
         '''
         Base class for all datasets
         Args:
@@ -28,6 +28,7 @@ class ZSLDataset(Dataset):
         self.train = train
         self.gzsl = gzsl
         self.synthetic = synthetic
+        self.device = device
 
         res101_data = scio.loadmat('./datasets/%s/res101.mat' % dset)
         self.features = self.normalize(res101_data['features'].T)
@@ -99,7 +100,7 @@ class ZSLDataset(Dataset):
             else:
                 aug_features = random.sample(features, n_samples)
             label = self.gzsl_map[key]['label']
-            dataset.extend([(torch.FloatTensor(f), label, key) for f in aug_features])
+            dataset.extend([(torch.tensor(f, dtype=torch.float32, device=self.device), label, key) for f in aug_features])
         return dataset
 
     def create_orig_dataset(self):

@@ -42,6 +42,7 @@ n_epochs = args.n_epochs
 
 # trainer object for mini batch training
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+print(device)
 train_agent = Trainer(
     device, x_dim, args.latent_dim, attr_dim,
     n_train=n_train, n_test=n_test, gzsl=args.gzsl,
@@ -56,7 +57,7 @@ params = {
     'drop_last': True
 }
 
-train_dataset = ZSLDataset(args.dataset, n_train, n_test, args.gzsl)
+train_dataset = ZSLDataset(args.dataset, n_train, n_test, args.gzsl, device=device)
 train_generator = DataLoader(train_dataset, **params)
 
 # =============================================================
@@ -81,7 +82,7 @@ else:
 # =============================================================
 # TRAIN THE GANs
 # =============================================================
-model_name = "%s_generator" % args.dataset
+model_name = "%s_gan" % args.dataset
 success = train_agent.load_model(model=model_name)
 if success:
     print("\nGAN parameters loaded....")
